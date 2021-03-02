@@ -13,5 +13,8 @@
  */
 
 return [
-    // ...
+    'db' => [
+        'driver' => 'Pdo_Pgsql',
+        'dsn' => 'pgsql:dbname = laminas-amz-project; host = localhost',
+    ]
 ];

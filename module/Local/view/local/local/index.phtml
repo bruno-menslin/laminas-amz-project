@@ -1,0 +1,30 @@
+<?php
+    $title = 'Locations';
+    $this->headTitle($title);
+?>
+    
+<h1><?= $this->escapeHtml($title) ?></h1>
+
+<p>
+    <a href="<?= $this->url('local', ['action' => 'add']) ?>">Add new local</a>
+</p>
+
+<table class="table">
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Type</th>
+    <th>&nbsp;</th>
+</tr>
+<?php foreach ($locations as $local) : ?>
+    <tr>
+        <td><?= $this->escapeHtml($local->id) ?></td>
+        <td><?= $this->escapeHtml($local->name) ?></td>
+        <td><?= $this->escapeHtml($local->type_id) ?></td>
+        <td>
+            <a href="<?= $this->url('local', ['action' => 'edit', 'id' => $local->id]) ?>">Edit</a>
+            <a href="<?= $this->url('local', ['action' => 'delete', 'id' => $local->id]) ?>">Delete</a>
+        </td>
+    </tr>
+<?php endforeach; ?>
+</table>
