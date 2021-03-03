@@ -26,6 +26,15 @@ class Local implements InputFilterAwareInterface
         $this->type_id = (!empty($data['type_id'])) ? $data['type_id'] : null;
     }
     
+    public function getArrayCopy()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'type_id' => $this->type_id,
+        ];
+    }
+    
     public function setInputFilter(InputFilterInterface $inputFilter)
     {
         throw new DomainException(sprintf(

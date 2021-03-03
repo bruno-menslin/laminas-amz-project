@@ -62,7 +62,7 @@ class LocalController extends AbstractActionController
         }
         
         $form = new LocalForm();
-//        $form->bind($local);
+        $form->bind($local);
         $form->get('submit')->setValue('Edit');
         
         $request = $this->getRequest();
