@@ -46,4 +46,29 @@ class LocalController extends AbstractActionController
         $this->table->saveLocal($local);
         return $this->redirect()->toRoute('local');        
     }
+    
+    public function deleteAction()
+    {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        if (! $id) {
+            return $this->redirect()->toRoute('local');
+        }
+        
+        $request = $this->getRequest();
+        if ($request->isPost()) { //dados foram enviados
+            
+            $del = $request->getPost('del', 'No');
+            if($del === 'Yes') {
+                $id = (int) $request->getPost('id');
+                $this->table->deleteLocal($id);
+            }
+            
+            return $this->redirect()->toRoute('local');
+        }
+        
+        return [
+            'id' => $id,
+            'local' => $this->table->getLocal($id),
+        ];
+    }
 }
