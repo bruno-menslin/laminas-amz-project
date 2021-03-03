@@ -20,8 +20,7 @@ class LocalController extends AbstractActionController
     public function indexAction()
     {
         $locations = $this->table->fetchAll();
-        $view = new ViewModel(['locations' => $locations]);
-        return $view;
+        return ['locations' => $locations];
     }
     
     public function addAction()

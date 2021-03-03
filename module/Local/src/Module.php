@@ -35,7 +35,7 @@ class Module implements ConfigProviderInterface {
                 Model\TypeTableGateway::class => function ($container) {
                     $dbAdapter = $container->get(AdapterInterface::class);
                     $resultSetPrototype = new ResultSet();
-                    $resultSetPrototype->setArrayObjectPrototype(new Model\Type());
+                    $resultSetPrototype->setArrayObjectPrototype(new Model\Type()); // entity object Type
 
                     return new TableGateway('local_type', $dbAdapter, null, $resultSetPrototype);
                 },

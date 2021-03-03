@@ -18,15 +18,13 @@ class LocalTable {
     
     public function fetchAll()
     {
-        
-        $sqlSelect = $this->typeTableGateway->getSql()->select(); 
-        $sqlSelect->columns(['TypeId' => 'id', 'TypeName' => 'name']); 
-        $sqlSelect->join('local', 'local_type.id = local.type_id', ['LocalId' => 'id', 'LocalName' => 'name', 'type_id']);
+        $select = $this->typeTableGateway->getSql()->select(); // new Select() nao funciona
+        $select->columns(['typeId' => 'id', 'typeName' => 'name']); 
+        $select->join('local', 'local_type.id = local.type_id', ['localId' => 'id', 'localName' => 'name', 'type_id']);
 
-    	$resultSet = $this->typeTableGateway->selectWith($sqlSelect);
+    	$result = $this->typeTableGateway->selectWith($select);
 
-    	return $resultSet->toArray();
-        
+    	return $result->toArray();
     }
     
     public function getLocal($id)
