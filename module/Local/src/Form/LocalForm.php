@@ -6,7 +6,7 @@ use Laminas\Form\Form;
 
 class LocalForm extends Form {
     
-    public $localTypes = ['Please Select'];
+    public $localTypes = ['Local type'];
     
     public function __construct($types)
     {
