@@ -1,0 +1,19 @@
+CREATE TABLE locationsTypes (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE locations (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(60) NOT NULL,
+	type_id INT NOT NULL,
+	FOREIGN KEY (type_id) REFERENCES locationsTypes(id)
+);
+
+INSERT INTO locationsTypes (name) VALUES ('Restaurant');
+INSERT INTO locationsTypes (name) VALUES ('Soccer Court');
+INSERT INTO locationsTypes (name) VALUES ('Square');
+
+INSERT INTO locations (name, type_id) VALUES ('Vale verde', 1);
+INSERT INTO locations (name, type_id) VALUES ('América Soccer Club', 2);
+INSERT INTO locations (name, type_id) VALUES ('Tiradentes', 3);
