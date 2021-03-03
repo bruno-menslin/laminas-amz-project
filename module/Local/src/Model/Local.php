@@ -4,6 +4,7 @@ namespace Local\Model;
 
 use DomainException;
 use Laminas\Filter\ToInt;
+use Laminas\Filter\ToNull;
 use Laminas\Filter\StripTags;
 use Laminas\Filter\StringTrim;
 use Laminas\Validator\StringLength;
@@ -83,6 +84,7 @@ class Local implements InputFilterAwareInterface
             'required' => true,
             'filters' => [
                 ['name' => ToInt::class],
+                ['name' => ToNull::class],
             ],
         ]);
 

@@ -27,6 +27,16 @@ class LocalTable {
     	return $result->toArray();
     }
     
+    public function getTypes()
+    {
+        $select = $this->typeTableGateway->getSql()->select();
+        $select->columns(['typeId' => 'id', 'typeName' => 'name']); 
+
+    	$result = $this->typeTableGateway->selectWith($select);
+
+    	return $result->toArray();
+    }
+    
     public function getLocal($id)
     {
         $id = (int) $id;

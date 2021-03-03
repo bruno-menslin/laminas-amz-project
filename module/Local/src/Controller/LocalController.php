@@ -25,7 +25,8 @@ class LocalController extends AbstractActionController
     
     public function addAction()
     {
-        $form = new LocalForm();
+        $types = $this->table->getTypes();
+        $form = new LocalForm($types);
         $form->get('submit')->setValue('Add');
         
         $request = $this->getRequest();
@@ -60,7 +61,8 @@ class LocalController extends AbstractActionController
             return $this->redirect()->toRoute('local');
         }
         
-        $form = new LocalForm();
+        $types = $this->table->getTypes();
+        $form = new LocalForm($types);
         $form->bind($local);
         $form->get('submit')->setValue('Edit');
         

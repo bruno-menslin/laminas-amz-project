@@ -5,9 +5,16 @@ namespace Local\Form;
 use Laminas\Form\Form;
 
 class LocalForm extends Form {
-    public function __construct($name = null)
+    
+    public $localTypes = ['Please Select'];
+    
+    public function __construct($types)
     {
         parent::__construct('local'); // define nome do form
+        
+        foreach ($types as $type) {
+            array_push($this->localTypes, $type['typeName']);         
+        };
         
         $this->add([
             'name' => 'id',
@@ -25,11 +32,7 @@ class LocalForm extends Form {
             'type' => 'select',
             'options' => [
                 'label' => 'Type',
-                'value_options' => [ //estatico, precisa fazer consulta no banco
-                    '1' => 'Restaurant',
-                    '2' => 'Soccer court',
-                    '3' => 'Square'
-                ]
+                'value_options' => $this->localTypes,
             ],
         ]);
         $this->add([
