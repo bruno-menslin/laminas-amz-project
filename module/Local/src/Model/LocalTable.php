@@ -4,25 +4,35 @@ namespace Local\Model;
 
 use Laminas\Db\TableGateway\TableGatewayInterface;
 use RuntimeException;
+use Laminas\Db\Sql\Select;
 
 class LocalTable {
-    private $tableGateway;
+    private $localTableGateway;
+    private $typeTableGateway;    
     
-    public function __construct(TableGatewayInterface $tableGateway)
+    public function __construct(TableGatewayInterface $localTableGateway, TableGatewayInterface $typeTableGateway)
     {
-        $this->tableGateway = $tableGateway;
+        $this->localTableGateway = $localTableGateway;
+        $this->typeTableGateway = $typeTableGateway;
     }
     
     public function fetchAll()
     {
-        return $this->tableGateway->select();
+        
+        $sqlSelect = $this->typeTableGateway->getSql()->select(); 
+        $sqlSelect->columns(['TypeId' => 'id', 'TypeName' => 'name']); 
+        $sqlSelect->join('local', 'local_type.id = local.type_id', ['LocalId' => 'id', 'LocalName' => 'name', 'type_id']);
+
+    	$resultSet = $this->typeTableGateway->selectWith($sqlSelect);
+
+    	return $resultSet->toArray();
         
     }
     
     public function getLocal($id)
     {
         $id = (int) $id;
-        $rowset = $this->tableGateway->select(['id' => $id]);
+        $rowset = $this->localTableGateway->select(['id' => $id]);
         $row = $rowset->current(); // somente primera linha
         if (!$row) {
             throw new RuntimeException(sprintf(
@@ -43,7 +53,7 @@ class LocalTable {
         $id = (int) $local->id;
         
         if ($id === 0) {
-            $this->tableGateway->insert($data);
+            $this->localTableGateway->insert($data);
             return;
         }
         // edit
@@ -57,11 +67,11 @@ class LocalTable {
             ));
         }
         
-        $this->tableGateway->update($data, ['id' => $id]);  
+        $this->localTableGateway->update($data, ['id' => $id]);  
     }
     
     public function deleteLocal($id)
     {
-        $this->tableGateway->delete(['id' => (int) $id]);
+        $this->localTableGateway->delete(['id' => (int) $id]);
     }
 }

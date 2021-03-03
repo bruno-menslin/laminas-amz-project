@@ -18,7 +18,11 @@ class Module implements ConfigProviderInterface {
         return [
             'factories' => [
                 Model\LocalTable::class => function($container) {
-                    return new Model\LocalTable($container->get(Model\LocalTableGateway::class));
+                    
+                    $localTableGateway = $container->get(Model\LocalTableGateway::class);
+                    $typeTableGateway = $container->get(Model\TypeTableGateway::class);                   
+            
+                    return new Model\LocalTable($localTableGateway, $typeTableGateway);
                 },
                         
                 Model\LocalTableGateway::class => function($container) {
@@ -26,6 +30,14 @@ class Module implements ConfigProviderInterface {
                     $resultSetPrototype = new ResultSet();
                     $resultSetPrototype->setArrayObjectPrototype(new Model\Local());
                     return new TableGateway('local', $dbAdapter, null, $resultSetPrototype);
+                },
+                        
+                Model\TypeTableGateway::class => function ($container) {
+                    $dbAdapter = $container->get(AdapterInterface::class);
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new Model\Type());
+
+                    return new TableGateway('local_type', $dbAdapter, null, $resultSetPrototype);
                 },
             ],
         ];
