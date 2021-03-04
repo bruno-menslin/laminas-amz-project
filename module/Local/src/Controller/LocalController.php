@@ -18,9 +18,20 @@ class LocalController extends AbstractActionController
     }
     
     public function indexAction()
-    {
-        $locations = $this->table->fetchAll();
-        return ['locations' => $locations];
+    {        
+        // recupera o paginator de LocalTable
+        $paginator = $this->table->fetchAll(true);
+
+        // define a pagina atual para o que foi passado na string,
+        // ou 1 se nada estiver definido, ou a pagina é invalida
+        $page = (int) $this->params()->fromQuery('page', 1);
+        $page = ($page < 1) ? 1 : $page;
+        $paginator->setCurrentPageNumber($page);
+
+        // numero de itens por pagina
+        $paginator->setItemCountPerPage(10);
+
+        return new ViewModel(['paginator' => $paginator]);  
     }
     
     public function addAction()

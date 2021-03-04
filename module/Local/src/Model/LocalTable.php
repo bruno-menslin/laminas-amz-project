@@ -5,6 +5,11 @@ namespace Local\Model;
 use Laminas\Db\TableGateway\TableGatewayInterface;
 use RuntimeException;
 use Laminas\Db\Sql\Select;
+use Laminas\Db\ResultSet\ResultSet;
+use Laminas\Paginator\Adapter\DbSelect;
+use Laminas\Paginator\Paginator;
+
+use Local\Model\Type;
 
 class LocalTable {
     private $localTableGateway;
@@ -16,15 +21,41 @@ class LocalTable {
         $this->typeTableGateway = $typeTableGateway;
     }
     
-    public function fetchAll()
+    public function fetchAll($paginated = false)
     {
         $select = $this->typeTableGateway->getSql()->select(); // new Select() nao funciona
         $select->columns(['typeId' => 'id', 'typeName' => 'name']); 
         $select->join('local', 'local_type.id = local.type_id', ['localId' => 'id', 'localName' => 'name', 'type_id']);
+        
+        if ($paginated) {
+            return $this->fetchPaginatedResults($select);
+        }
 
     	$result = $this->typeTableGateway->selectWith($select);
+        return $result;    	
+    }
+    
+    private function fetchPaginatedResults($select)
+    {    
+        // novo result set beaseando no objeto entidade Type, faz parte do adapter
+        $resultSetPrototype = new ResultSet();
+        $resultSetPrototype->setArrayObjectPrototype(new Type());
 
-    	return $result->toArray();
+        // novo objeto pagination adapter
+        $paginatorAdapter = new DbSelect(
+
+            // objeto select configurado
+            $select,
+
+            // o adaptador para executa-lo
+            $this->typeTableGateway->getAdapter(),
+
+            // result set para hydrate
+            $resultSetPrototype
+        );
+
+        $paginator = new Paginator($paginatorAdapter); // requere um adapter
+        return $paginator; // retorna objetos Album como os resultados sem paginacao
     }
     
     public function getTypes()

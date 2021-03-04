@@ -16,15 +16,32 @@
     <th>Type</th>
     <th>&nbsp;</th>
 </tr>
-<?php foreach ($locations as $local) : ?>
+<?php foreach ($this->paginator as $local) : ?>
     <tr>
-        <td><?= $this->escapeHtml($local['localId']) ?></td>
-        <td><?= $this->escapeHtml($local['localName']) ?></td>
-        <td><?= $this->escapeHtml($local['typeName']) ?></td>
+        <td><?= $this->escapeHtml($local->localId) ?></td>
+        <td><?= $this->escapeHtml($local->localName) ?></td>
+        <td><?= $this->escapeHtml($local->typeName) ?></td>
         <td>
-            <a href="<?= $this->url('local', ['action' => 'edit', 'id' => $local['localId']]) ?>">Edit</a>
-            <a href="<?= $this->url('local', ['action' => 'delete', 'id' => $local['localId']]) ?>">Delete</a>
+            <a href="<?= $this->url('local', ['action' => 'edit', 'id' => $local->localId]) ?>">Edit</a>
+            <a href="<?= $this->url('local', ['action' => 'delete', 'id' => $local->localId]) ?>">Delete</a>
         </td>
     </tr>
 <?php endforeach; ?>
 </table>
+
+<!-- view helpers para exibir paginacao -->
+<?= $this->paginationControl(
+
+        // objeto paginator
+        $this->paginator,
+
+        // tipo de scroll
+        'sliding',
+
+        // partial para usar para renderizar o control
+        'partial/paginator',
+
+        // rota para quando o usuario clicar num link de control
+        ['route' => 'local'] // indexAction
+    ) 
+?> 
