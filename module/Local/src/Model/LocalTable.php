@@ -4,34 +4,29 @@ namespace Local\Model;
 
 use Laminas\Db\TableGateway\TableGatewayInterface;
 use RuntimeException;
-use Laminas\Db\Sql\Select;
 use Laminas\Db\ResultSet\ResultSet;
 use Laminas\Paginator\Adapter\DbSelect;
 use Laminas\Paginator\Paginator;
 
-use Local\Model\Type;
-
 class LocalTable {
-    private $localTableGateway;
-    private $typeTableGateway;    
+    private $tableGateway;
     
-    public function __construct(TableGatewayInterface $localTableGateway, TableGatewayInterface $typeTableGateway)
+    public function __construct(TableGatewayInterface $tableGateway)
     {
-        $this->localTableGateway = $localTableGateway;
-        $this->typeTableGateway = $typeTableGateway;
+        $this->tableGateway = $tableGateway;
     }
     
     public function fetchAll($paginated = false)
     {
-        $select = $this->typeTableGateway->getSql()->select(); // new Select() nao funciona
-        $select->columns(['typeId' => 'id', 'typeName' => 'name']); 
-        $select->join('local', 'local_type.id = local.type_id', ['localId' => 'id', 'localName' => 'name', 'type_id']);
+        $select = $this->tableGateway->getSql()->select(); // new Select() nao funciona
+        $select->columns(['id', 'name', 'type_id']); 
+        $select->join('local_type', 'local_type.id = local.type_id', ['type_name' => 'name']);
         
         if ($paginated) {
             return $this->fetchPaginatedResults($select);
         }
 
-    	$result = $this->typeTableGateway->selectWith($select);
+    	$result = $this->tableGateway->selectWith($select);
         return $result;    	
     }
     
@@ -39,7 +34,7 @@ class LocalTable {
     {    
         // novo result set beaseando no objeto entidade Type, faz parte do adapter
         $resultSetPrototype = new ResultSet();
-        $resultSetPrototype->setArrayObjectPrototype(new Type());
+        $resultSetPrototype->setArrayObjectPrototype(new Local());
 
         // novo objeto pagination adapter
         $paginatorAdapter = new DbSelect(
@@ -48,7 +43,7 @@ class LocalTable {
             $select,
 
             // o adaptador para executa-lo
-            $this->typeTableGateway->getAdapter(),
+            $this->tableGateway->getAdapter(),
 
             // result set para hydrate
             $resultSetPrototype
@@ -56,22 +51,12 @@ class LocalTable {
 
         $paginator = new Paginator($paginatorAdapter); // requere um adapter
         return $paginator; // retorna objetos Album como os resultados sem paginacao
-    }
-    
-    public function getTypes()
-    {
-        $select = $this->typeTableGateway->getSql()->select();
-        $select->columns(['typeId' => 'id', 'typeName' => 'name']); 
-
-    	$result = $this->typeTableGateway->selectWith($select);
-
-    	return $result->toArray();
-    }
+    }    
     
     public function getLocal($id)
     {
         $id = (int) $id;
-        $rowset = $this->localTableGateway->select(['id' => $id]);
+        $rowset = $this->tableGateway->select(['id' => $id]);
         $row = $rowset->current(); // somente primera linha
         if (!$row) {
             throw new RuntimeException(sprintf(
@@ -92,7 +77,7 @@ class LocalTable {
         $id = (int) $local->id;
         
         if ($id === 0) {
-            $this->localTableGateway->insert($data);
+            $this->tableGateway->insert($data);
             return;
         }
         // edit
@@ -106,11 +91,11 @@ class LocalTable {
             ));
         }
         
-        $this->localTableGateway->update($data, ['id' => $id]);  
+        $this->tableGateway->update($data, ['id' => $id]);  
     }
     
     public function deleteLocal($id)
     {
-        $this->localTableGateway->delete(['id' => (int) $id]);
+        $this->tableGateway->delete(['id' => (int) $id]);
     }
 }

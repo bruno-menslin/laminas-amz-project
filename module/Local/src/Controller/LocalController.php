@@ -5,22 +5,25 @@ namespace Local\Controller;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Local\Model\LocalTable;
+use Local\Model\TypeTable;
 use Local\Form\LocalForm;
 use Local\Model\Local;
 
 class LocalController extends AbstractActionController
 {
-    private $table;
+    private $localTable;
+    private $typeTable;
     
-    public function __construct(LocalTable $table)
+    public function __construct(LocalTable $localTable, TypeTable $typeTable)
     {
-        $this->table = $table;
+        $this->localTable = $localTable;
+        $this->typeTable = $typeTable;
     }
     
     public function indexAction()
     {        
         // recupera o paginator de LocalTable
-        $paginator = $this->table->fetchAll(true);
+        $paginator = $this->localTable->fetchAll(true);
 
         // define a pagina atual para o que foi passado na string,
         // ou 1 se nada estiver definido, ou a pagina é invalida
@@ -36,7 +39,7 @@ class LocalController extends AbstractActionController
     
     public function addAction()
     {
-        $types = $this->table->getTypes();
+        $types = $this->typeTable->fetchAll();
         $form = new LocalForm($types);
         $form->get('submit')->setValue('Add');
         
@@ -55,7 +58,7 @@ class LocalController extends AbstractActionController
         }
         
         $local->exchangeArray($form->getData());
-        $this->table->saveLocal($local);
+        $this->localTable->saveLocal($local);
         return $this->redirect()->toRoute('local');        
     }
     
@@ -67,12 +70,12 @@ class LocalController extends AbstractActionController
         }
         
         try { // verifica se o local com $id existe
-            $local = $this->table->getLocal($id); 
+            $local = $this->localTable->getLocal($id); 
         } catch (Exception $e) {
             return $this->redirect()->toRoute('local');
         }
         
-        $types = $this->table->getTypes();
+        $types = $this->typeTable->fetchAll();
         $form = new LocalForm($types);
         $form->bind($local);
         $form->get('submit')->setValue('Edit');
@@ -92,7 +95,7 @@ class LocalController extends AbstractActionController
         }
         // dados validos
         
-        $this->table->saveLocal($local);
+        $this->localTable->saveLocal($local);
         return $this->redirect()->toRoute('local');
     }
     
@@ -109,7 +112,7 @@ class LocalController extends AbstractActionController
             $del = $request->getPost('del', 'No');
             if($del === 'Yes') {
                 $id = (int) $request->getPost('id');
-                $this->table->deleteLocal($id);
+                $this->localTable->deleteLocal($id);
             }
             
             return $this->redirect()->toRoute('local');
@@ -117,7 +120,7 @@ class LocalController extends AbstractActionController
         
         return [
             'id' => $id,
-            'local' => $this->table->getLocal($id),
+            'local' => $this->localTable->getLocal($id),
         ];
     }
 }

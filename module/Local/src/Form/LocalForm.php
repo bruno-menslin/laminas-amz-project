@@ -13,7 +13,7 @@ class LocalForm extends Form {
         parent::__construct('local'); // define nome do form
         
         foreach ($types as $type) {
-            array_push($this->localTypes, $type['typeName']);         
+            array_push($this->localTypes, $type['name']);         
         };
         
         $this->add([

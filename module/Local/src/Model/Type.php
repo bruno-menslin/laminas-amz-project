@@ -3,21 +3,13 @@
 namespace Local\Model;
 
 class Type { // Module.php TypeTableGateway
-    public $typeId; // propriedades que vao p index.phtml
-    public $typeName;
-    
-    public $localId;
-    public $localName;
-    public $type_id;
+    public $id; // propriedades que vao p index.phtml
+    public $name;
     
     public function exchangeArray(array $data)
     {
-        $this->typeId = (!empty($data['typeId'])) ? $data['typeId'] : null;
-        $this->typeName = (!empty($data['typeName'])) ? $data['typeName'] : null;
-        
-        $this->localId = (!empty($data['localId'])) ? $data['localId'] : null;
-        $this->localName = (!empty($data['localName'])) ? $data['localName'] : null;
-        $this->type_id = (!empty($data['type_id'])) ? $data['type_id'] : null;
+        $this->id = (!empty($data['id'])) ? $data['id'] : null;
+        $this->name = (!empty($data['name'])) ? $data['name'] : null;
     }
     
     public function getArrayCopy()

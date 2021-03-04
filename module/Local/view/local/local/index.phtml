@@ -18,12 +18,12 @@
 </tr>
 <?php foreach ($this->paginator as $local) : ?>
     <tr>
-        <td><?= $this->escapeHtml($local->localId) ?></td>
-        <td><?= $this->escapeHtml($local->localName) ?></td>
-        <td><?= $this->escapeHtml($local->typeName) ?></td>
+        <td><?= $this->escapeHtml($local->id) ?></td>
+        <td><?= $this->escapeHtml($local->name) ?></td>
+        <td><?= $this->escapeHtml($local->type_name) ?></td>
         <td>
-            <a href="<?= $this->url('local', ['action' => 'edit', 'id' => $local->localId]) ?>">Edit</a>
-            <a href="<?= $this->url('local', ['action' => 'delete', 'id' => $local->localId]) ?>">Delete</a>
+            <a href="<?= $this->url('local', ['action' => 'edit', 'id' => $local->id]) ?>">Edit</a>
+            <a href="<?= $this->url('local', ['action' => 'delete', 'id' => $local->id]) ?>">Delete</a>
         </td>
     </tr>
 <?php endforeach; ?>

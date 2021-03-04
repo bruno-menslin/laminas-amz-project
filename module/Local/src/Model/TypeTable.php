@@ -2,6 +2,8 @@
 
 namespace Local\Model;
 
+use Laminas\Db\TableGateway\TableGatewayInterface;
+
 class TypeTable {
     private $tableGateway;
     
@@ -11,7 +13,12 @@ class TypeTable {
     }
 
     public function fetchAll()
-    {
-        return $this->tableGateway->select();
+    {        
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(['id', 'name']); 
+
+    	$result = $this->tableGateway->selectWith($select);
+
+    	return $result->toArray();
     }
 }
