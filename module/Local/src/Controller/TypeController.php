@@ -9,13 +9,21 @@ use Laminas\View\Model\ViewModel;
 use Local\Form\TypeForm;
 use Local\Model\Type;
 use Laminas\Json\Json;
+use Laminas\Paginator\Paginator;
+use Laminas\Paginator\Adapter;
 
 class TypeController extends AbstractActionController
 {
     public function indexAction()
     {
-        $types = $this->fetchTypes();
-        return new ViewModel(['types' => $types]);
+        $types = $this->fetchTypes();        
+        $paginator = new Paginator(new Adapter\ArrayAdapter((array) $types));
+        $page = (int) $this->params()->fromQuery('page', 1);
+        $page = ($page < 1) ? 1 : $page;
+        $paginator->setCurrentPageNumber($page);
+        $paginator->setItemCountPerPage(10);
+
+        return new ViewModel(['paginator' => $paginator]); 
     }
     
     public function addAction()

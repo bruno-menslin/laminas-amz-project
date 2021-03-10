@@ -15,7 +15,7 @@
     <th>Name</th>
     <th>&nbsp;</th>
 </tr>
-<?php foreach ($this->types as $type) : ?>
+<?php foreach ($this->paginator as $type) : ?>
     <tr>
         <td><?= $this->escapeHtml($type->id) ?></td>
         <td><?= $this->escapeHtml($type->name) ?></td>
@@ -26,3 +26,19 @@
     </tr>
 <?php endforeach; ?>
 </table>
+
+<?= $this->paginationControl(
+
+        // objeto paginator
+        $this->paginator,
+
+        // tipo de scroll
+        'sliding',
+
+        // partial para usar para renderizar o control
+        'partial/paginator',
+
+        // rota para quando o usuario clicar num link de control
+        ['route' => 'localtype'] // indexAction
+    ) 
+?> 
