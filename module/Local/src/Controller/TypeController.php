@@ -111,7 +111,15 @@ class TypeController extends AbstractActionController
         $client->setHeaders($headers);
         $client->setRawBody(Json::encode(['id' => $id]));        
         $response = $client->send();
-        return json_decode($response->getBody());
+        $data = json_decode($response->getBody());
+        
+        if (empty($data->id)) {
+            return $this->redirect()->toRoute('local');
+        }
+        
+        $type = new Type();
+        $type->exchangeArray((array) $data);
+        return $type;
     }
     
     private function saveType($type)
