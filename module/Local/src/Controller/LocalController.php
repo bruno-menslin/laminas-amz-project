@@ -4,8 +4,6 @@ namespace Local\Controller;
 
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
-use Local\Model\LocalTable;
-use Local\Model\TypeTable;
 use Local\Form\LocalForm;
 use Local\Model\Local;
 use Laminas\Http\Client;
@@ -15,16 +13,7 @@ use Laminas\Paginator\Adapter;
 use Laminas\Json\Json;
 
 class LocalController extends AbstractActionController
-{
-    private $localTable;
-    private $typeTable;
-    
-    public function __construct(LocalTable $localTable, TypeTable $typeTable)
-    {
-        $this->localTable = $localTable;
-        $this->typeTable = $typeTable;
-    }
-    
+{    
     public function indexAction()
     {                
         $locations = $this->fetchLocations();        
@@ -62,7 +51,7 @@ class LocalController extends AbstractActionController
         
         $local->exchangeArray($form->getData());
         
-        // salvar user
+        // salvar local
         $client = new Client();                
         $uri = 'http://0.0.0.0:8080/local';
         $client->setUri($uri);
@@ -77,7 +66,7 @@ class LocalController extends AbstractActionController
         $client->setHeaders($headers);
         $client->setRawBody(Json::encode(['name' => $local->name, 'type_id' => $local->type_id]));        
         $client->send();
-        // salvar user
+        // salvar local
         
         return $this->redirect()->toRoute('local');        
     }
@@ -115,7 +104,23 @@ class LocalController extends AbstractActionController
         }
         // dados validos
         
-        $this->localTable->saveLocal($local);
+        // salvar local
+        $client = new Client();                
+        $uri = 'http://0.0.0.0:8080/local/' . $id;
+        $client->setUri($uri);
+        $client->setMethod(Request::METHOD_PATCH);
+        
+        $headers = [
+            'Content-Type: application/json', 
+            'Accept: */*', 'Accept-Encoding: gzip, deflate, br', 
+            'Connection: keep-alive'
+        ];
+        
+        $client->setHeaders($headers);
+        $client->setRawBody(Json::encode(['name' => $local->name, 'type_id' => $local->type_id]));        
+        $client->send();
+        // salvar local        
+        
         return $this->redirect()->toRoute('local');
     }
     
