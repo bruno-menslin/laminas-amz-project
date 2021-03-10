@@ -49,25 +49,8 @@ class LocalController extends AbstractActionController
             return ['form' => $form];
         }
         
-        $local->exchangeArray($form->getData());
-        
-        // salvar local
-        $client = new Client();                
-        $uri = 'http://0.0.0.0:8080/local';
-        $client->setUri($uri);
-        $client->setMethod(Request::METHOD_POST);
-        
-        $headers = [
-            'Content-Type: application/json', 
-            'Accept: */*', 'Accept-Encoding: gzip, deflate, br', 
-            'Connection: keep-alive'
-        ];
-        
-        $client->setHeaders($headers);
-        $client->setRawBody(Json::encode(['name' => $local->name, 'type_id' => $local->type_id]));        
-        $client->send();
-        // salvar local
-        
+        $local->exchangeArray($form->getData());                
+        $this->saveLocal($local);               
         return $this->redirect()->toRoute('local');        
     }
     
@@ -102,25 +85,8 @@ class LocalController extends AbstractActionController
         if (! $form->isValid()) {
             return $viewData;
         }
-        // dados validos
         
-        // salvar local
-        $client = new Client();                
-        $uri = 'http://0.0.0.0:8080/local/' . $id;
-        $client->setUri($uri);
-        $client->setMethod(Request::METHOD_PATCH);
-        
-        $headers = [
-            'Content-Type: application/json', 
-            'Accept: */*', 'Accept-Encoding: gzip, deflate, br', 
-            'Connection: keep-alive'
-        ];
-        
-        $client->setHeaders($headers);
-        $client->setRawBody(Json::encode(['name' => $local->name, 'type_id' => $local->type_id]));        
-        $client->send();
-        // salvar local        
-        
+        $this->saveLocal($local, $id);               
         return $this->redirect()->toRoute('local');
     }
     
@@ -208,5 +174,27 @@ class LocalController extends AbstractActionController
         $client = new Client();
         $response = $client->send($request);
         return json_decode($response->getBody());        
+    }
+    
+    private function saveLocal($local, $id = null) {
+        $client = new Client();
+        
+        if ($id === null) {    
+            $uri = 'http://0.0.0.0:8080/local';
+            $client->setMethod(Request::METHOD_POST);
+        } else {
+            $uri = 'http://0.0.0.0:8080/local/' . $id;
+            $client->setMethod(Request::METHOD_PATCH);
+        }
+        
+        $client->setUri($uri);
+        $headers = [
+            'Content-Type: application/json', 
+            'Accept: */*', 'Accept-Encoding: gzip, deflate, br', 
+            'Connection: keep-alive'
+        ];
+        $client->setHeaders($headers);
+        $client->setRawBody(Json::encode(['name' => $local->name, 'type_id' => $local->type_id]));        
+        $client->send();
     }
 }
