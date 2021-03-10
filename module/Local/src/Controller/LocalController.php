@@ -60,34 +60,24 @@ class LocalController extends AbstractActionController
             return ['form' => $form];
         }
         
-        $local->exchangeArray($form->getData());        
+        $local->exchangeArray($form->getData());
         
-        $request = new Request();
-        $request->setMethod(Request::METHOD_POST);
-        $request->setUri('/local');
-        $request->getHeaders()->addHeaders([            
-            'Content-Type' => 'application/json',
-            'Host' => '0.0.0.0:8080',
-            'Accept' => '*/*',
-            'Accept-Encoding' => 'gzip, deflate, br',
-            'Connection' => 'keep-alive',
-            
-        ]);
-        $request->getPost()->name = $local->name;
-        $request->getPost()->type_id = $local->type_id;
-        $request->setContent($request->getPost()->toString());
+        // salvar user
+        $client = new Client();                
+        $uri = 'http://0.0.0.0:8080/local';
+        $client->setUri($uri);
+        $client->setMethod(Request::METHOD_POST);
         
-        $client = new Client();
-        $client->send($request);
-                
-//        $uri = 'http://0.0.0.0:8080/local';
-//        $client->setUri($uri);
-//        $client->setMethod(Request::METHOD_POST);                
-//        $client->setRawBody(Json::encode(['name' => $local->name, 'type_id' => $local->type_id]));                
-//        $response = $client->send();
-//        $content = $response->getBody();
+        $headers = [
+            'Content-Type: application/json', 
+            'Accept: */*', 'Accept-Encoding: gzip, deflate, br', 
+            'Connection: keep-alive'
+        ];
         
-//        return ['a' => $content, 'form' => $form];
+        $client->setHeaders($headers);
+        $client->setRawBody(Json::encode(['name' => $local->name, 'type_id' => $local->type_id]));        
+        $client->send();
+        // salvar user
         
         return $this->redirect()->toRoute('local');        
     }
