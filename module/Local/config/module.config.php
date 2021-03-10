@@ -22,11 +22,26 @@ return [
                     ],
                 ],
             ],
+            'localtype' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/localtype[/:action[/:id]]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[0-9]+'
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\TypeController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
         ],
     ],
     'controllers' => [
         'factories' => [
             Controller\LocalController::class => InvokableFactory::class,
+            Controller\TypeController::class => InvokableFactory::class,
         ],
     ],
     'view_manager' => [

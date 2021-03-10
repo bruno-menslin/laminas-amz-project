@@ -1,0 +1,28 @@
+<?php
+    $title = 'Location Types';
+    $this->headTitle($title);
+?>
+    
+<h1><?= $this->escapeHtml($title) ?></h1>
+
+<p>
+    <a href="<?= $this->url('localtype', ['action' => 'index']) ?>">Add new type</a>
+</p>
+
+<table class="table">
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>&nbsp;</th>
+</tr>
+<?php foreach ($this->types as $type) : ?>
+    <tr>
+        <td><?= $this->escapeHtml($type->id) ?></td>
+        <td><?= $this->escapeHtml($type->name) ?></td>
+        <td>
+            <a href="<?= $this->url('local', ['action' => 'edit', 'id' => $type->id]) ?>">Edit</a>
+            <a href="<?= $this->url('local', ['action' => 'delete', 'id' => $type->id]) ?>">Delete</a>
+        </td>
+    </tr>
+<?php endforeach; ?>
+</table>
