@@ -42,6 +42,41 @@ class TypeController extends AbstractActionController
         return $this->redirect()->toRoute('localtype');        
     }
     
+    public function editAction()
+    {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        if ($id === 0) {
+            return $this->redirect()->toRoute('localtype', ['action' => 'add']);
+        }
+        
+        try { // verifica se o tipo com $id existe
+            $type = $this->fetchType($id);                        
+        } catch (Exception $e) {
+            return $this->redirect()->toRoute('localtype');
+        }
+        
+        $form = new TypeForm();
+        $form->bind($type);
+        $form->get('submit')->setValue('Edit');
+        
+        $request = $this->getRequest();
+        $viewData = ['id' => $id, 'form' => $form];
+        
+        if (! $request->isPost()) { // nao foram enviados dados
+            return $viewData; // usuario nao preencheu form ainda
+        }
+        
+        $form->setInputFilter($type->getInputFilter());
+        $form->setData($request->getPost());
+        
+        if (! $form->isValid()) {
+            return $viewData;
+        }
+        
+        $this->saveType($type, $id);               
+        return $this->redirect()->toRoute('localtype');
+    }
+    
     public function deleteAction()
     {
         $id = (int) $this->params()->fromRoute('id', 0);
@@ -122,19 +157,26 @@ class TypeController extends AbstractActionController
         return $type;
     }
     
-    private function saveType($type)
+    private function saveType($type, $id = null)
     {
         $client = new Client();
-        $uri = 'http://0.0.0.0:8080/localtype';
-        $client->setMethod(Request::METHOD_POST);
+        
+        if ($id === null) {
+            $client->setMethod(Request::METHOD_POST);
+            $client->setRawBody(Json::encode(['name' => $type->name]));
+        } else {
+            $client->setMethod(Request::METHOD_PATCH);
+            $client->setRawBody(Json::encode(['id' => $type->id, 'name' => $type->name]));
+        }
+        
+        $uri = 'http://0.0.0.0:8080/localtype';        
         $client->setUri($uri);
         $headers = [
             'Content-Type: application/json', 
             'Accept: */*', 'Accept-Encoding: gzip, deflate, br', 
             'Connection: keep-alive'
         ];
-        $client->setHeaders($headers);
-        $client->setRawBody(Json::encode(['name' => $type->name]));        
+        $client->setHeaders($headers);                
         $client->send();
     }    
 }

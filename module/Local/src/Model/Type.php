@@ -64,7 +64,7 @@ class Type implements InputFilterAwareInterface
                     'options' => [
                         'encoding' => 'UTF-8',
                         'min' => 1,
-                        'max' => 60,
+                        'max' => 30,
                     ],
                 ],
             ],
