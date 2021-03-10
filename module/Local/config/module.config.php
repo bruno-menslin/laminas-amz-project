@@ -3,6 +3,7 @@
 namespace Local;
 
 use Laminas\Router\Http\Segment;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 return [
     'router' => [
@@ -21,6 +22,11 @@ return [
                     ],
                 ],
             ],
+        ],
+    ],
+    'controllers' => [
+        'factories' => [
+            Controller\LocalController::class => InvokableFactory::class,
         ],
     ],
     'view_manager' => [
