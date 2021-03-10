@@ -21,7 +21,7 @@
         <td><?= $this->escapeHtml($type->name) ?></td>
         <td>
             <a href="<?= $this->url('local', ['action' => 'edit', 'id' => $type->id]) ?>">Edit</a>
-            <a href="<?= $this->url('local', ['action' => 'delete', 'id' => $type->id]) ?>">Delete</a>
+            <a href="<?= $this->url('localtype', ['action' => 'delete', 'id' => $type->id]) ?>">Delete</a>
         </td>
     </tr>
 <?php endforeach; ?>
