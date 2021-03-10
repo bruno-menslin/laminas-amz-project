@@ -182,8 +182,13 @@ class LocalController extends AbstractActionController
         $client = new Client();
         $response = $client->send($request);
         $data = json_decode($response->getBody());
+        
+        if (empty($data->id)) {
+            return $this->redirect()->toRoute('local');
+        }
+        
         $local = new Local();
-        $local->exchangeArray((array) $data);
+        $local->exchangeArray((array) $data);        
         return $local;
     }
     
