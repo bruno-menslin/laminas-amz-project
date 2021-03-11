@@ -49,8 +49,13 @@ class LocalController extends AbstractActionController
             return ['form' => $form];
         }
         
-        $local->exchangeArray($form->getData());                
-        $this->saveLocal($local);               
+        $local->exchangeArray($form->getData());               
+        $this->rest(
+            'http://0.0.0.0:8080/local', 
+            Request::METHOD_POST,
+            ['name' => $local->name, 'type_id' => $local->type_id]
+        );
+        
         return $this->redirect()->toRoute('local');        
     }
     
@@ -86,7 +91,12 @@ class LocalController extends AbstractActionController
             return $viewData;
         }
         
-        $this->saveLocal($local, $id);               
+        $this->rest(
+            "http://0.0.0.0:8080/local/{$id}", 
+            Request::METHOD_PATCH,
+            ['name' => $local->name, 'type_id' => $local->type_id]
+        ); 
+        
         return $this->redirect()->toRoute('local');
     }
     
@@ -103,18 +113,13 @@ class LocalController extends AbstractActionController
             $del = $request->getPost('del', 'No');
             
             if($del === 'Yes') {
-                $id = (int) $request->getPost('id');
+                $id = (int) $request->getPost('id');    
                 
-                // deletar local
-                $request = new Request();
-                $request->setMethod(Request::METHOD_DELETE);
-                $request->setUri('http://0.0.0.0:8080/local/' . $id);
-                $request->getHeaders()->addHeaders([
-                    'Accept' => '*/*',
-                ]);
-                $client = new Client();
-                $client->send($request);                
-                // deletar local
+                $this->rest(
+                    "http://0.0.0.0:8080/local/{$id}",
+                    Request::METHOD_DELETE,
+                    ['']
+                );                
             }
             
             return $this->redirect()->toRoute('local');
@@ -130,28 +135,22 @@ class LocalController extends AbstractActionController
     
     public function fetchLocations()
     {
-        $request = new Request();
-        $request->setMethod(Request::METHOD_GET);
-        $request->setUri('http://0.0.0.0:8080/local');
-        $request->getHeaders()->addHeaders([
-            'Accept' => '*/*',
-        ]);
-        $client = new Client();
-        $response = $client->send($request);
-        $locations = json_decode($response->getBody());
-        return $locations->_embedded->local;
+        $response = $this->rest(
+            'http://0.0.0.0:8080/local',
+            Request::METHOD_GET,
+            []
+        );        
+        $data = json_decode($response->getBody());
+        return $data->_embedded->local;
     }
     
     public function fetchLocal($id)
     {
-        $request = new Request();
-        $request->setMethod(Request::METHOD_GET);
-        $request->setUri('http://0.0.0.0:8080/local/' . $id);
-        $request->getHeaders()->addHeaders([
-            'Accept' => '*/*',
-        ]);
-        $client = new Client();
-        $response = $client->send($request);
+        $response = $this->rest(
+            "http://0.0.0.0:8080/local/{$id}",
+            Request::METHOD_GET,
+            []
+        );        
         $data = json_decode($response->getBody());
         
         if (empty($data->id)) {
@@ -159,42 +158,34 @@ class LocalController extends AbstractActionController
         }
         
         $local = new Local();
-        $local->exchangeArray((array) $data);        
+        $local->exchangeArray((array) $data);
         return $local;
     }
     
     public function fetchTypes()
     {        
-        $request = new Request();
-        $request->setMethod(Request::METHOD_GET);
-        $request->setUri('http://0.0.0.0:8080/localtype');
-        $request->getHeaders()->addHeaders([
-            'Accept' => '*/*',
-        ]);
-        $client = new Client();
-        $response = $client->send($request);
-        return json_decode($response->getBody());        
+        $response = $this->rest(
+            'http://0.0.0.0:8080/localtype',
+            Request::METHOD_GET,
+            []
+        );        
+        return json_decode($response->getBody());             
     }
     
-    private function saveLocal($local, $id = null) {
-        $client = new Client();
-        
-        if ($id === null) {    
-            $uri = 'http://0.0.0.0:8080/local';
-            $client->setMethod(Request::METHOD_POST);
-        } else {
-            $uri = 'http://0.0.0.0:8080/local/' . $id;
-            $client->setMethod(Request::METHOD_PATCH);
-        }
-        
-        $client->setUri($uri);
+    public function rest($uri, $method, $body)    
+    {
         $headers = [
             'Content-Type: application/json', 
             'Accept: */*', 'Accept-Encoding: gzip, deflate, br', 
             'Connection: keep-alive'
         ];
+        
+        $client = new Client();
+        $client->setUri($uri);
+        $client->setMethod($method); //Request::METHOD_POST
         $client->setHeaders($headers);
-        $client->setRawBody(Json::encode(['name' => $local->name, 'type_id' => $local->type_id]));        
-        $client->send();
+        $client->setRawBody(Json::encode($body));        
+        $response = $client->send();
+        return $response;
     }
 }
