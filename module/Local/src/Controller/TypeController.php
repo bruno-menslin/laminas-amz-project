@@ -46,7 +46,11 @@ class TypeController extends AbstractActionController
         }
         
         $type->exchangeArray($form->getData());
-        $this->saveType($type);
+        $this->rpc(
+            Request::METHOD_POST,
+            ['name' => $type->name]
+        );
+        
         return $this->redirect()->toRoute('localtype');        
     }
     
@@ -81,7 +85,11 @@ class TypeController extends AbstractActionController
             return $viewData;
         }
         
-        $this->saveType($type, $id);               
+        $this->rpc(
+            Request::METHOD_PATCH,
+            ['id' => $type->id, 'name' => $type->name]
+        );
+        
         return $this->redirect()->toRoute('localtype');
     }
     
@@ -100,20 +108,10 @@ class TypeController extends AbstractActionController
             if($del === 'Yes') {
                 $id = (int) $request->getPost('id'); // post, no submit
                 
-                // deletar tipo
-                $client = new Client();
-                $uri = 'http://0.0.0.0:8080/localtype';
-                $client->setUri($uri);
-                $client->setMethod(Request::METHOD_DELETE);                
-                $headers = [
-                    'Content-Type: application/json', 
-                    'Accept: */*', 'Accept-Encoding: gzip, deflate, br', 
-                    'Connection: keep-alive'
-                ];
-                $client->setHeaders($headers);
-                $client->setRawBody(Json::encode(['id' => $id]));        
-                $client->send();
-                // deletar tipo
+                $this->rpc(
+                    Request::METHOD_DELETE,
+                    ['id' => $id]
+                );
             }
             
             return $this->redirect()->toRoute('localtype');
@@ -129,31 +127,21 @@ class TypeController extends AbstractActionController
     
     private function fetchTypes()
     {
-        $request = new Request;
-        $request->setMethod(Request::METHOD_GET);
-        $request->setUri('http://0.0.0.0:8080/localtype');
-        $request->getHeaders()->addHeaders([
-            'Accept' => '*/*',
-        ]);
-        $client = new Client();
-        $response = $client->send($request);
-        return json_decode($response->getBody());
+        $response = $this->rpc(
+            Request::METHOD_GET,
+            []
+        );
+        return json_decode($response->getBody());        
     }
     
     private function fetchType($id)
     {
-        $client = new Client();
-        $uri = 'http://0.0.0.0:8080/localtype';
-        $client->setUri($uri);
-        $client->setMethod(Request::METHOD_GET);        
-        $headers = [
-            'Content-Type: application/json', 
-            'Accept: */*', 'Accept-Encoding: gzip, deflate, br', 
-            'Connection: keep-alive'
-        ];
-        $client->setHeaders($headers);
-        $client->setRawBody(Json::encode(['id' => $id]));        
-        $response = $client->send();
+        
+        $response = $this->rpc(
+            Request::METHOD_GET,
+            ['id' => $id]
+        );
+        
         $data = json_decode($response->getBody());
         
         if (empty($data->id)) {
@@ -164,27 +152,21 @@ class TypeController extends AbstractActionController
         $type->exchangeArray((array) $data);
         return $type;
     }
-    
-    private function saveType($type, $id = null)
+
+    public function rpc($method, $body)    
     {
-        $client = new Client();
-        
-        if ($id === null) {
-            $client->setMethod(Request::METHOD_POST);
-            $client->setRawBody(Json::encode(['name' => $type->name]));
-        } else {
-            $client->setMethod(Request::METHOD_PATCH);
-            $client->setRawBody(Json::encode(['id' => $type->id, 'name' => $type->name]));
-        }
-        
-        $uri = 'http://0.0.0.0:8080/localtype';        
-        $client->setUri($uri);
         $headers = [
             'Content-Type: application/json', 
             'Accept: */*', 'Accept-Encoding: gzip, deflate, br', 
             'Connection: keep-alive'
         ];
-        $client->setHeaders($headers);                
-        $client->send();
+        
+        $client = new Client();
+        $client->setUri('http://0.0.0.0:8080/localtype');
+        $client->setMethod($method);
+        $client->setHeaders($headers);
+        $client->setRawBody(Json::encode($body));        
+        $response = $client->send();
+        return $response;
     }    
 }
